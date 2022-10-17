@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"os"
 
 	_ "github.com/lib/pq"
 	"github.com/ridhwan90/Golang-grpc/api"
@@ -12,13 +13,23 @@ import (
 const (
 	dbDriver      = "postgres"
 	dbSource      = "postgresql://postgres:postgres@db:5432/postgres?sslmode=disable"
+	dbDriverProd  = "postgres"
 	serverAddress = "0.0.0.0:8080"
 )
 
 func main() {
-	conn, err := sql.Open(dbDriver, dbSource)
-	if err != nil {
-		log.Fatal("cannot connect to db:", err)
+	var conn *sql.DB
+	var err error
+	if os.Getenv("ENV") == "PROD" {
+		conn, err = sql.Open(dbDriverProd, os.Getenv("DATABASE_URL"))
+		if err != nil {
+			log.Fatal("cannot connect to db:", err)
+		}
+	} else {
+		conn, err = sql.Open(dbDriver, dbSource)
+		if err != nil {
+			log.Fatal("cannot connect to db:", err)
+		}
 	}
 
 	db_query := db.New(conn)
