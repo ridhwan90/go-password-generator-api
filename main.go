@@ -14,7 +14,7 @@ const (
 	dbDriver      = "postgres"
 	dbSource      = "postgresql://postgres:postgres@db:5432/postgres?sslmode=disable"
 	dbDriverProd  = "postgres"
-	serverAddress = "0.0.0.0:8080"
+	serverAddress = "0.0.0.0:"
 )
 
 func main() {
@@ -37,8 +37,8 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot create server:", err)
 	}
-
-	err = server.Start(serverAddress)
+	var port string = os.Getenv("PORT")
+	err = server.Start(serverAddress + port)
 	if err != nil {
 		log.Fatal("cannot start server:", err)
 	}
