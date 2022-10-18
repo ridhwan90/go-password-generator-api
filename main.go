@@ -17,7 +17,7 @@ import (
 
 const (
 	dbDriver              = "postgres"
-	dbSource              = "postgresql://postgres:postgres@db:5432/postgres?sslmode=disable"
+	dbSource              = "postgresql://postgres:postgres@postgres:5432/postgres?sslmode=disable"
 	dbDriverProd          = "postgres"
 	serverAddress         = "0.0.0.0:"
 	GrpcServerAddress     = "0.0.0.0:9090"
@@ -40,7 +40,8 @@ func main() {
 	}
 
 	db_query := db.New(conn)
-	runGrpcServer(db_query)
+	// runGrpcServer(db_query)
+	runGinServer(db_query)
 }
 
 func runGrpcServer(db_query *db.Queries) {
