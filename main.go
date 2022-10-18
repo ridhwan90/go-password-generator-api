@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"sync"
 
 	_ "github.com/lib/pq"
 	"github.com/ridhwan90/Golang-grpc/api"
@@ -40,11 +41,14 @@ func main() {
 	}
 
 	db_query := db.New(conn)
-	// runGrpcServer(db_query)
-	runGinServer(db_query)
+	wg := new(sync.WaitGroup)
+	wg.Add(2)
+	go runGrpcServer(db_query, wg)
+	go runGinServer(db_query, wg)
+	wg.Wait()
 }
 
-func runGrpcServer(db_query *db.Queries) {
+func runGrpcServer(db_query *db.Queries, wg *sync.WaitGroup) {
 	server, err := grpcapi.NewServer(db_query)
 	if err != nil {
 		log.Fatal("cannot create server:", err)
@@ -75,9 +79,10 @@ func runGrpcServer(db_query *db.Queries) {
 	if err != nil {
 		log.Fatal("cannot start gRPC server")
 	}
+	wg.Done()
 }
 
-func runGinServer(db_query *db.Queries) {
+func runGinServer(db_query *db.Queries, wg *sync.WaitGroup) {
 	server, err := api.NewServer(db_query)
 	if err != nil {
 		log.Fatal("cannot create server:", err)
@@ -94,5 +99,5 @@ func runGinServer(db_query *db.Queries) {
 			log.Fatal("cannot start server:", err)
 		}
 	}
-
+	wg.Done()
 }
